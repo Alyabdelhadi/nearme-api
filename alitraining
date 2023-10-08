@@ -1,0 +1,75 @@
+Private Sub BtnAddFeatures_Click(sender As Object, e As EventArgs) Handles BtnAddFeatures.Click
+    Dim myMasterPage As Cufex_Site = CType(Page.Master, Cufex_Site)
+
+    ' Create a new DataTable and fill it with the existing data
+    Dim objTable As New DataTable("NewTable")
+    objTable = FillFeaturesTableFromGrid()
+
+    ' Capture the selected value from the DropDownList
+    Dim ddlPriority As DropDownList = DirectCast(rptFeatures.Controls(rptFeatures.Controls.Count - 1).FindControl("ddlPriority"), DropDownList)
+    Dim selectedPriority As String = ddlPriority.SelectedValue
+
+    ' Add a new row with the selected value
+    objTable.Rows.Add(0, txtFeaturesDescription.Text, txtFeaturesPriority.Text, IIf(rbtFeaturesActive.Checked, 1, 0), selectedPriority)
+
+    ' Bind the DataTable to the Repeater
+    rptFeatures.DataSource = objTable.DefaultView
+    rptFeatures.DataBind()
+
+    ' Clear input controls and update visibility
+    ClearFeatures(False)
+    DivFeaturesHolder.Visible = rptFeatures.Items.Count > 0
+End Sub
+----------------------------
+<asp:Repeater ID="rptFeatures" runat="server">
+    <ItemTemplate>
+        <div class="FloatStyleFull floatL" style="border: 1px solid #e2e3ed; padding: 40px 0 0; border-radius: 10px; margin-bottom: 20px;">
+            <!-- ... other controls ... -->
+
+            <!-- Add DropDownList inside the repeater -->
+            <div class="col-md-4 col-sm-6 col-xs-12 floatL pdBox">
+                <div class="u-relative">
+                    <div class="BoxTitle"><%= getCufex_Keywords("Priority") %><span style="color: #CD3067;">*</span></div>
+                    <asp:TextBox ID="txtFeaturesGrdPriority" runat="server" CssClass="MyTextBox" MaxLength="3" Text='<%# Eval("Priority") %>'></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="requiredFeaturesGrdPriority" Display="Dynamic" runat="server" ControlToValidate="txtFeaturesGrdPriority"
+                        ValidationGroup="FormValidation" CssClass="ErrorVal" ErrorMessage="- Features Priority Is Required">&nbsp;</asp:RequiredFieldValidator>
+                    
+                    <!-- Add DropDownList here -->
+                    <asp:DropDownList ID="ddlPriority" runat="server" CssClass="MyDropDownList" DataSource='<%# GetPriorityDataSource() %>' DataTextField="Text" DataValueField="Value" SelectedValue='<%# Eval("Priority") %>'></asp:DropDownList>
+                </div>
+            </div>
+
+            <!-- ... other controls ... -->
+        </div>
+    </ItemTemplate>
+</asp:Repeater>
+------------------------------
+Private Function FillFeaturesTableFromGrid(Optional ByVal Clear As Boolean = False, Optional ByVal DelIndex As Integer = -1) As DataTable
+    Dim objTable As New DataTable("NewTable")
+    objTable.Columns.Add("id", System.Type.GetType("System.Int32"))
+    objTable.Columns.Add("Description", System.Type.GetType("System.String"))
+    objTable.Columns.Add("Priority", System.Type.GetType("System.Int32"))
+    objTable.Columns.Add("Active", System.Type.GetType("System.Int32"))
+    objTable.Columns.Add("SelectedPriority", System.Type.GetType("System.String")) ' Add a column for the selected priority
+
+    Dim i As Integer
+    If Not Clear Then
+        For i = 0 To rptFeatures.Items.Count - 1
+            If DelIndex <> i Then
+                Dim objDataRow As DataRow
+                objDataRow = objTable.NewRow()
+                objDataRow("id") = Val(CType(rptFeatures.Items(i).FindControl("lblgrdPicID"), Literal).Text)
+                objDataRow("Description") = CType(rptFeatures.Items(i).FindControl("txtFeaturesGrdDescription"), TextBox).Text
+                objDataRow("Priority") = Val(CType(rptFeatures.Items(i).FindControl("txtFeaturesGrdPriority"), TextBox).Text)
+                objDataRow("Active") = IIf(CType(rptFeatures.Items(i).FindControl("rbtFeaturesGrdActive"), HtmlInputRadioButton).Checked, 1, 0)
+                
+                ' Get the selected value from the DropDownList named "ddlPriority"
+                Dim ddlPriority As DropDownList = DirectCast(rptFeatures.Items(i).FindControl("ddlPriority"), DropDownList)
+                objDataRow("SelectedPriority") = ddlPriority.SelectedValue
+                
+                objTable.Rows.Add(objDataRow)
+            End If
+        Next
+    End If
+    Return objTable
+End Function
