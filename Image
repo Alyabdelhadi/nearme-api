@@ -1,0 +1,11 @@
+' Assuming you have retrieved the image name from the database and stored it in the imageName variable.
+Dim imageName As String = GetImageNameFromDatabase() ' Replace GetImageNameFromDatabase() with your own function to fetch the image name.
+
+' Set the base path for your images.
+Dim basePath As String = "path_to_your_image_folder/" ' Replace this with the actual path to your image folder.
+
+' Combine the base path and image name to get the full image path.
+Dim imagePath As String = basePath & imageName
+
+' Set the background image URL dynamically for the description div.
+description.Style.Add("background-image", "url('" & imagePath & "')")
