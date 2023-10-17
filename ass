@@ -1,4 +1,53 @@
+<div id="DivIntro" class="Intro">
+  <div class="container">
+    <div class="First">
+      <div class="content">
+        <div class="title">
+          <asp:Literal ID="ltrTitle" runat="server"></asp:Literal>
+        </div>
+        <div class="Desc">
+          <asp:Literal ID="LtrDesc" runat="server"></asp:Literal>
+        </div>
+      </div>
+    </div>
+    <div runat="server" class="Second">
+      <!-- Content for the second div -->
+    </div>
+  </div>
+</div>
+     
+#DivIntro {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust this value as needed */
+}
 
+.container {
+  display: flex;
+  width: 100%;
+
+}
+
+.First {
+  height: 100vh; /* Adjust this value as needed */
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f2f2f2; /* Adjust background color as needed */
+}
+
+.content {
+  text-align: center;
+}
+
+.Second {
+  height: 100vh; /* Adjust this value as needed */
+
+  flex: 1;
+  /* Add styling for the second div as needed */
+}
 .center {
     font-family: Quicksand;
     font-size: 80px;
