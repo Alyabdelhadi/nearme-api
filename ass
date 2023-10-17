@@ -93,3 +93,23 @@
         width: 100vw;
     }
 }
+ 
+                <div id="DivIntro" runat="server" class="Intro">
+                   
+                   <div class="Title">
+                       <div class="center">
+                   
+                  <asp:Literal ID="ltrTitle" runat="server"></asp:Literal>
+                           </div>
+                      <div class="Desc">
+
+                 <asp:Literal ID="LtrDesc" runat="server"></asp:Literal>
+               </div>  
+                  </div>
+          
+                        <div id="description" runat="server"  class="Description" >
+                                        
+                       </div>
+
+                       </div>
+               
