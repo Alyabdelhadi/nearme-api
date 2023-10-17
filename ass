@@ -1,14 +1,95 @@
 
-   <div id="DivIntro" runat="server" class="Intro">
-                   
-                   <div class="Title W50">
-                   <h1>
-                  <asp:Literal ID="ltrTitle" runat="server"></asp:Literal></h1>
-                   </div>
-               
-                  
-                        <div class="Description  W50">
-                   <h3>
-                 <asp:Literal ID="ltrDesc" runat="server"></asp:Literal></h3>
-                  </div>
-                       </div>
+.center {
+    font-family: Quicksand;
+    font-size: 80px;
+    height: 201px;
+    width: 532px;
+ 
+}
+.Desc {
+    font-family: Quicksand;
+    font-size: 16px;
+    font-weight: bold;
+}
+.Title {
+    width: 50%;
+    display: inline-block;
+    height: 100%;
+    background-size: cover;
+    text-align:center;
+    justify-content:center;
+}
+
+.Description {
+    width: 50%;
+    display: inline-block;
+    height: 100%;
+  background-size: cover;
+}
+
+.Intro {
+   
+    margin: 0;
+    height: 100vh;
+    width: 100%;
+}
+
+
+
+
+
+
+
+@media all and (max-width:840px) {
+  
+    .Title {
+        width: 100%;
+        display: inline-block;
+        height:50%;
+        align-items: center;
+        text-align: center;
+    }
+
+    .Description {
+        width: 100%;
+        display: inline-block;
+        height: 50%;
+        align-items: center;
+        text-align: center;
+        background-size: cover;
+    }
+
+    .Intro {
+        margin: 0;
+        height: 100%;
+        width: 100vw;
+    }
+  
+}
+
+@media all and (max-width:480px) {
+
+
+    .Title {
+        width: 100%;
+        display: inline-block;
+        height: 50%;
+        align-items: center;
+        text-align: center;
+    }
+
+    .Description {
+        width: 100%;
+        display: inline-block;
+        height: 50%;
+        align-items: center;
+        text-align: center;
+        background-size: cover;
+    }
+
+    .Intro {
+        margin: 0;
+        height: 100%;
+        width: 100vw;
+    }
+}
