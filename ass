@@ -1,3 +1,32 @@
+Protected Sub MyRepeater_ItemDataBound(ByVal sender As Object, ByVal e As RepeaterItemEventArgs)
+    If e.Item.ItemType = ListItemType.Item OrElse e.Item.ItemType = ListItemType.AlternatingItem Then
+        Dim dataItem As YourDataType = TryCast(e.Item.DataItem, YourDataType) ' Replace 'YourDataType' with the type of your data
+        Dim itemDiv As HtmlGenericControl = TryCast(e.Item.FindControl("ItemDiv"), HtmlGenericControl) ' Replace "ItemDiv" with the actual ID
+
+        If itemDiv IsNot Nothing Then
+            If dataItem.Id Mod 2 = 0 Then
+                ' Apply styles for even IDs (e.g., odd in the case of zero-based index)
+                itemDiv.Attributes.Add("style", "display:flex; align-items:center;")
+                Dim titleDiv As HtmlGenericControl = TryCast(e.Item.FindControl("TitleDiv"), HtmlGenericControl) ' Replace "TitleDiv" with the actual ID
+                Dim imageDiv As HtmlGenericControl = TryCast(e.Item.FindControl("ImageDiv"), HtmlGenericControl) ' Replace "ImageDiv" with the actual ID
+                If titleDiv IsNot Nothing AndAlso imageDiv IsNot Nothing Then
+                    titleDiv.Attributes.Add("style", "flex:1; order: 2;") ' Adjust styles as needed
+                    imageDiv.Attributes.Add("style", "flex:1; order: 1;") ' Adjust styles as needed
+                End If
+            Else
+                ' Apply styles for odd IDs
+                itemDiv.Attributes.Add("style", "display:flex; align-items:center;")
+                Dim titleDiv As HtmlGenericControl = TryCast(e.Item.FindControl("TitleDiv"), HtmlGenericControl) ' Replace "TitleDiv" with the actual ID
+                Dim imageDiv As HtmlGenericControl = TryCast(e.Item.FindControl("ImageDiv"), HtmlGenericControl) ' Replace "ImageDiv" with the actual ID
+                If titleDiv IsNot Nothing AndAlso imageDiv IsNot Nothing Then
+                    titleDiv.Attributes.Add("style", "flex:1; order: 1;") ' Adjust styles as needed
+                    imageDiv.Attributes.Add("style", "flex:1; order: 2;") ' Adjust styles as needed
+                End If
+            End If
+        End If
+    End If
+End Sub
+
 protected void MyRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
 {
     if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
