@@ -1,3 +1,16 @@
+protected void MyRepeater_ItemDataBound(object sender, RepeaterItemEventArgs e)
+{
+    if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem)
+    {
+        // Fetch the data item
+        var dataItem = e.Item.DataItem as YourDataType; // Replace 'YourDataType' with the type of your data
+
+        // Find the div element in the repeater item
+        var itemDiv = e.Item.FindControl("ItemDiv") as HtmlGenericControl; // Replace "ItemDiv" with the actual ID
+
+        // Apply custom styles
+        if (itemDiv != null)
+        {
 <div id="DivIntro" class="Intro">
   <div class="container">
     <div class="First">
