@@ -1,3 +1,72 @@
+<%@ Page Language="VB" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Swiper Integration Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+</head>
+<body>
+    <div id="swiper-container" class="swiper-container">
+        <div class="swiper-wrapper">
+            <% ' VB.NET code to fetch and display data
+               Dim connectionString As String = "YourConnectionString"
+               Dim data As List(Of YourDataClass) = New List(Of YourDataClass)()
+
+               Using connection As New SqlConnection(connectionString)
+                   Dim command As New SqlCommand("SELECT Title, Description, ImageUrl, Priority FROM YourTable ORDER BY Priority", connection)
+                   connection.Open()
+                   Dim reader As SqlDataReader = command.ExecuteReader()
+                   While reader.Read()
+                       Dim item As New YourDataClass()
+                       item.Title = reader("Title").ToString()
+                       item.Description = reader("Description").ToString()
+                       item.ImageUrl = reader("ImageUrl").ToString()
+                       item.Priority = Convert.ToInt32(reader("Priority"))
+                       data.Add(item)
+                   End While
+                   reader.Close()
+               End Using
+
+               For Each item As YourDataClass In data
+            %>
+            <div class="swiper-slide">
+                <h2><%= item.Title %></h2>
+                <p><%= item.Description %></p>
+                <img src="<%= item.ImageUrl %>" alt="Slide Image" />
+                <p>Priority: <%= item.Priority %></p>
+            </div>
+            <% Next %>
+        </div>
+        <!-- Add Swiper pagination -->
+        <div class="swiper-pagination"></div>
+    </div>
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var swiper = new Swiper('.swiper-container', {
+                // Optional parameters
+                direction: 'horizontal',
+                loop: true,
+
+                // If you need pagination
+                pagination: {
+                    el: '.swiper-pagination',
+                },
+
+                // Navigation arrows
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+
+                // And more...
+            });
+        });
+    </script>
+</body>
+</html>
+
 Protected Sub MyRepeater_ItemDataBound(ByVal sender As Object, ByVal e As RepeaterItemEventArgs)
     If e.Item.ItemType = ListItemType.Item OrElse e.Item.ItemType = ListItemType.AlternatingItem Then
         Dim dataItem As YourDataType = TryCast(e.Item.DataItem, YourDataType) ' Replace 'YourDataType' with the type of your data
