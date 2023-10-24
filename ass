@@ -1,3 +1,32 @@
+function AboutLoad() {
+    var swiper = new Swiper(".mySwiper", {
+        loop: true,
+        navigation: {
+            nextEl: ".next2",
+            prevEl: ".next1"
+        }
+    });
+
+    // Add click event listener to next1 button for going to the previous slide
+    $(".next1").on("click", function() {
+        swiper.slidePrev();
+    });
+
+    // Add click event listener to next2 button for going to the next slide
+    $(".next2").on("click", function() {
+        swiper.slideNext();
+    });
+
+    SetMyScroll();
+
+    $(window).scroll(function() {
+        SetMyScroll();
+    });
+}
+
+// Rest of your code...
+
+
 <%@ Page Language="VB" %>
 <!DOCTYPE html>
 <html>
