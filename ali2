@@ -1,110 +1,175 @@
-<!-- list_item.xml -->
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/itemTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Title"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:id="@+id/itemDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Description"
-            android:textSize="14sp"
-            android:layout_marginTop="8dp"/>
-
-        <TextView
-            android:id="@+id/itemDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Date"
-            android:textSize="12sp"
-            android:layout_marginTop="8dp"/>
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Delete"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"/>
-</RelativeLayout>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Scroll Animation Example</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <style>
-        #animated-section {
-            height: 1000px;
-            background-color: lightblue;
+            binding.noResultPlaces.visibility = View.VISIBLE
         }
-    </style>
-</head>
-<body>
-    <div id="animated-section">
-        This is the animated section.
-    </div>
+    }
+    * © 2023, NI Arabia FZCO
+    */
 
-    <script>
-        $(document).ready(function() {
-            $(window).scroll(function() {
-                var scroll = $(window).scrollTop();
-                if (scroll > 200) { // Adjust the value as per your requirement
-                    $("#animated-section").animate({opacity: '0.5'}, "slow");
-                } else {
-                    $("#animated-section").animate({opacity: '1'}, "slow");
+    package com.niarabia.clubr.fragments
+
+    import android.os.Bundle
+    import android.util.Log
+    import android.view.LayoutInflater
+    import android.view.Menu
+    import android.view.View
+    import android.view.ViewGroup
+    import android.widget.Toast
+    import androidx.fragment.app.Fragment
+    import androidx.lifecycle.Observer
+    import androidx.recyclerview.widget.LinearLayoutManager
+    import androidx.recyclerview.widget.RecyclerView
+    import com.niarabia.clubr.adapters.PlacesAdapter
+    import com.niarabia.clubr.data.model.Places
+    import com.niarabia.clubr.data.model.PlacesParent
+    import com.niarabia.clubr.data.model.ProgressBarModel
+    import com.niarabia.clubr.databinding.FragmentPlacesListingsBinding
+    import com.niarabia.clubr.utls.global.GlobalFun
+    import com.niarabia.clubr.viewmodels.MainViewModel
+    import org.koin.androidx.viewmodel.ext.android.viewModel
+
+
+    /**
+     * A simple [Fragment] subclass.
+     * Use the [PlacesListings.newInstance] factory method to
+     * create an instance of this fragment.
+     */
+    class PlacesListings : Fragment() {
+        private lateinit var recyclerView: RecyclerView
+        private var batchSize = 3
+        private var _binding: FragmentPlacesListingsBinding? = null
+        private var isLoading = false
+        private val pageSize: Int = 3
+        private var noMoreMatches: Boolean = false
+
+        private val binding get() = _binding!!
+        private var dataList = mutableListOf<PlacesParent>()
+        private var after: Int = 0
+
+        private val viewModel by viewModel<MainViewModel>()
+
+        override fun onCreateView(
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
+        ): View? {
+
+            _binding = FragmentPlacesListingsBinding.inflate(inflater, container, false)
+
+
+            recyclerView = binding.menuRecyclerView
+            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (!recyclerView.canScrollVertically(1) && newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        Log.d("-----", "end")
+                        loadMore()
+                    }
                 }
-            });
-        });
-    </script>
-</body>
-</html>
+            })
+
+            viewModel.getAllPlaces(pageSize, after)
+
+            return binding.root
+        }
+
+
+        override fun onResume() {
+            super.onResume()
+        }
+
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+//
+            viewModel.placesList.observe(viewLifecycleOwner, Observer { newData ->
+                newData?.let {
+                    // Check if it's a "load more" operation
+                    if (isLoading) {
+                        // Add the new data to your existing dataList
+                        dataList.addAll(it)
+
+                        // Reset the flag after handling the "load more" operation
+                        isLoading = false
+                    } else {
+                        // Clear the existing data and add the new data
+                        dataList.clear()
+                        dataList.addAll(it)
+
+                        setupRecyclerView()
+                    }
+                }
+            })
+            viewModel.errorText.observe(viewLifecycleOwner, Observer {
+                if (it != null && it != "") {
+                    GlobalFun.snack(requireActivity(), it)
+                    viewModel.errorText.value = "" //reset value
+                }
+            })
+            viewModel.progressbar.observe(viewLifecycleOwner, Observer {
+                if (it != null) {
+                    binding.progress = it
+                    viewModel.progressbar.value = null
+                }
+            })
+        }
+
+        override fun onDestroyView() {
+            super.onDestroyView()
+            _binding = null
+        }
+
+
+        //region Rv----
+        private fun setupRecyclerView() {
+            val placesMenuAdapter = PlacesAdapter {
+            }
+
+            placesMenuAdapter.setData(dataList)
+
+            binding.adapter = placesMenuAdapter
+            binding.menuRecyclerView.layoutManager = LinearLayoutManager(requireActivity())
 
 
 
-.center{
-    margin-top:50vh;
+            binding.progressPlaces.visibility = View.GONE
+            if (dataList.isEmpty()) {
+
+
+
+                private fun loadMore() {
+        if (!isLoading) {
+            isLoading = true
+
+            // Get the current 'after' value and calculate the new 'after' value
+            val currentAfter = viewModel.getCurrentAfter()
+            val newAfter = currentAfter + pageSize
+
+            // Call the ViewModel function to get more places with the updated 'after' value
+            viewModel.getAllPlaces(pageSize, newAfter)
+        }
+    }
+
+    private fun updateAdapter() {
+        val placesMenuAdapter = binding.adapter as PlacesAdapter
+
+        placesMenuAdapter.setData(dataList)
+
+        placesMenuAdapter.notifyItemRangeInserted(after, dataList.size - 1)
+
+
+        binding.progressPlaces.visibility = View.GONE
+        binding.noResultPlaces.visibility = if (dataList.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+
+
+    //region option menu
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.clear() //hide all option menu items
+        super.onPrepareOptionsMenu(menu)
+    }
+    //endregion
 }
-
-.Title{
-    width: 50%;
-    background: lightblue;
-    display: inline-block;
-    height: 100%;
-    align-items:center;
-    text-align:center;
-}
-
-.Description {
-    width: 50%;
-    display: inline-block;
-    height: 100%;
-    align-items: center;
-    text-align: center;
-  
-}
-
-.Intro {
-   
-    margin: 0;
-    height: 100vh;
-    width: 100%;
-}
-
