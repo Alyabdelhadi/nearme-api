@@ -3,6 +3,7 @@
     }
     * © 2023, NI Arabia FZCO
     */
+            recyclerView.scrollToPosition(newPosition)
 
     package com.niarabia.clubr.fragments
 
